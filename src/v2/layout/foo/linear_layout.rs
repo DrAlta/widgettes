@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use crate::v2::{Layout, LayoutResponse, Rect, Splat};
+use crate::v2::{
+    foo::{Callback, ChildId, InterSpaxel, Spaxel},
+    Layout, LayoutResponse, Rect, Splat,
+};
 
 #[derive(Clone, Copy)]
 pub enum Axis {
@@ -10,11 +13,11 @@ pub enum Axis {
 
 pub fn linear_layout(
     axis: Axis,
-    offered: Rect<i32>,
-    callback: Option<Layout<i32, i32, usize>>,
-    mut children_response: HashMap<usize, Splat<i32, i32, usize>>,
-    children: Vec<usize>,
-) -> LayoutResponse<i32, i32, usize> {
+    offered: Rect<Spaxel>,
+    callback: Option<Callback>,
+    mut children_response: HashMap<usize, Splat<InterSpaxel, Spaxel, ChildId>>,
+    children: Vec<ChildId>,
+) -> LayoutResponse<InterSpaxel, Spaxel, ChildId, Callback> {
     let mut callback = callback.unwrap_or(Layout {
         left: 0,
         top: 0,
@@ -72,6 +75,22 @@ pub fn linear_layout(
                 height: used,
             },
         };
+        let mut turtle = 0;
+        match axis {
+            Axis::Horizontal => {
+                for (_, c) in &mut callback.children {
+                    c.left = turtle;
+                    turtle += c.area.width;
+                }
+            }
+            Axis::Vertical => {
+                for (_, c) in &mut callback.children {
+                    c.top = turtle;
+                    turtle += c.area.height;
+                }
+            }
+        }
+
         LayoutResponse::Layout(Splat {
             rect,
             childrens_layouts: callback.children,

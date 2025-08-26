@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
-use crate::v2::layout::{Layout, Rect, Splat};
+use crate::v2::layout::{Rect, Splat};
 
-pub enum LayoutResponse<InterSpaxel, Spaxel, ChildId: Eq + std::hash::Hash> {
+pub enum LayoutResponse<InterSpaxel, Spaxel, ChildId: Eq + std::hash::Hash, Callback> {
     Layout(Splat<InterSpaxel, Spaxel, ChildId>),
     RequestLayoutOfChildren {
-        callback: Layout<InterSpaxel, Spaxel, ChildId>,
+        callback: Callback,
         children_to_layout: HashMap<ChildId, Rect<Spaxel>>,
     },
 }

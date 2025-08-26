@@ -11,8 +11,6 @@
 pub mod foo;
 mod layout_response;
 pub use layout_response::LayoutResponse;
-mod linear_layout;
-pub use linear_layout::linear_layout;
 mod rect;
 pub use rect::Rect;
 mod layout;
