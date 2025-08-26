@@ -3,4 +3,3 @@ pub struct Rect<Spaxel> {
     pub width: Spaxel,
     pub height: Spaxel,
 }
-

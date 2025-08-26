@@ -1,33 +1,26 @@
 use std::collections::HashMap;
 
-use crate::v2::{layout::{LayoutResponse, Rect, Resolution, Splat, Widget}, Layout};
-
-
+use crate::v2::{
+    layout::{
+        linear_layout::{linear_layout, Axis},
+        LayoutResponse, Rect, Resolution, Splat, Widget,
+    },
+    Layout,
+};
 
 #[derive(Debug)]
 pub enum Foo<Spaxel> {
     Base(Rect<Spaxel>),
     HBox,
+    VBox,
 }
 
 impl<Target> Widget<i32, i32, usize, Target> for Foo<i32> {
-    fn draw_under_children(
-        &self,
-        _left: i32,
-        _top: i32,
-        _area: Rect<i32>,
-        _target: Target,
-    ) {
+    fn draw_under_children(&self, _left: i32, _top: i32, _area: Rect<i32>, _target: Target) {
         todo!()
     }
 
-    fn draw_over_children(
-        &self,
-        _left: i32,
-        _top: i32,
-        _area: Rect<i32>,
-        _target: Target,
-    ) {
+    fn draw_over_children(&self, _left: i32, _top: i32, _area: Rect<i32>, _target: Target) {
         todo!()
     }
 
@@ -41,37 +34,51 @@ impl<Target> Widget<i32, i32, usize, Target> for Foo<i32> {
     ) -> Resolution {
         todo!()
     }
-    
+
     fn layout(
         &self,
         offered: Rect<i32>,
         callback: Option<super::Layout<i32, i32, usize>>,
-        mut children_response: HashMap::<usize, super::Splat<i32, i32, usize>>,
+        mut children_response: HashMap<usize, super::Splat<i32, i32, usize>>,
         children: Vec<usize>,
-        ) -> LayoutResponse<i32, i32, usize> {
-            let mut callback = if let Some(callback) = callback {
-                callback
-            } else {
-                Layout{ left: 0, top: 0, area: offered.clone(), children: HashMap::new() }
-            };
-            match self {
-            Foo::Base(rect) => LayoutResponse::Layout(Splat{rect: rect.clone(), childrens_layouts:HashMap::new() }),
+    ) -> LayoutResponse<i32, i32, usize> {
+        let mut callback = if let Some(callback) = callback {
+            callback
+        } else {
+            Layout {
+                left: 0,
+                top: 0,
+                area: offered.clone(),
+                children: HashMap::new(),
+            }
+        };
+        match self {
+            Foo::Base(rect) => LayoutResponse::Layout(Splat {
+                rect: rect.clone(),
+                childrens_layouts: HashMap::new(),
+            }),
             Foo::HBox => {
-                let children_to_layout: Vec<_> = children.into_iter().filter(
-                    |y|
-                    {
-                        ! children_response.contains_key(y)
-                    }
-                )
-                .collect();
-                children_response.retain(|k,v| {
-                    let Some(previous_layout) =  callback.children.get(k) else {
-                        return true
+                let children_to_layout: Vec<_> = children
+                    .into_iter()
+                    .filter(|y| !children_response.contains_key(y))
+                    .collect();
+                children_response.retain(|k, v| {
+                    let Some(previous_layout) = callback.children.get(k) else {
+                        return true;
                     };
-                    v.rect != previous_layout.area || v.childrens_layouts != previous_layout.children
+                    v.rect != previous_layout.area
+                        || v.childrens_layouts != previous_layout.children
                 });
                 for (child_id, splat) in children_response {
-                    callback.children.insert(child_id, super::Layout { left: 0, top: 0, area: splat.rect, children: splat.childrens_layouts });
+                    callback.children.insert(
+                        child_id,
+                        super::Layout {
+                            left: 0,
+                            top: 0,
+                            area: splat.rect,
+                            children: splat.childrens_layouts,
+                        },
+                    );
                 }
                 let mut used = 0;
                 let mut height = 0;
@@ -81,24 +88,43 @@ impl<Target> Widget<i32, i32, usize, Target> for Foo<i32> {
                 }
                 if children_to_layout.is_empty() {
                     //calc my layout
-                    LayoutResponse::Layout(Splat { rect: Rect { width: used, height }, childrens_layouts: callback.children })
+                    LayoutResponse::Layout(Splat {
+                        rect: Rect {
+                            width: used,
+                            height,
+                        },
+                        childrens_layouts: callback.children,
+                    })
                 } else {
                     let free = offered.width - used;
                     let share = free / children_to_layout.len() as i32;
-                    LayoutResponse::RequestLayoutOfChildren { 
-                        callback, 
-                        children_to_layout: children_to_layout.into_iter()
-                        .map(
-                            |child_id|
-                            {
-                                (child_id, Rect{width: share, height})
-                            }
-                        )
-                        .collect()
+                    LayoutResponse::RequestLayoutOfChildren {
+                        callback,
+                        children_to_layout: children_to_layout
+                            .into_iter()
+                            .map(|child_id| {
+                                (
+                                    child_id,
+                                    Rect {
+                                        width: share,
+                                        height,
+                                    },
+                                )
+                            })
+                            .collect(),
                     }
                 }
             }
+            Foo::VBox => {
+                linear_layout(
+                    Axis::Vertical,
+                    offered,
+                    callback.into(),
+                    children_response,
+                    children,
+                );
+                todo!("need to test this out the chane HBox to use it too")
+            }
         }
-    }   
-
+    }
 }

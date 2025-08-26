@@ -7,7 +7,7 @@ pub trait Widget<InterSpaxel, Spaxel, ChildId: Eq + std::hash::Hash, Target> {
         &self,
         offered: Rect<Spaxel>,
         callback: Option<Layout<InterSpaxel, Spaxel, ChildId>>,
-        children_responses: HashMap::<ChildId, Splat<InterSpaxel, Spaxel, ChildId>>,
+        children_responses: HashMap<ChildId, Splat<InterSpaxel, Spaxel, ChildId>>,
         children: Vec<ChildId>,
     ) -> LayoutResponse<InterSpaxel, Spaxel, ChildId>;
     fn draw_under_children(

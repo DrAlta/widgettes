@@ -4,7 +4,7 @@ use widgettes::v2::widgets::timebar::timebar::*;
 
 #[macroquad::main("Time Bar Scheduler")]
 async fn main() {
-/*
+    /*
     println!(
         "{:?}",
         find_overlaps((10, 20), &[
@@ -16,17 +16,17 @@ async fn main() {
         ]));
     */
     let appointments = vec![
-        ApptInfo { 
-            start_time: 10, 
+        ApptInfo {
+            start_time: 10,
             end_time: 20,
         },
-        ApptInfo { 
-            start_time: 0, 
+        ApptInfo {
+            start_time: 0,
             end_time: 12,
         },
-        ApptInfo { 
-            start_time: 15, 
-            end_time: 30
+        ApptInfo {
+            start_time: 15,
+            end_time: 30,
         },
     ];
 

@@ -55,7 +55,13 @@ async fn main() {
         draw_texture(&texture_standard, 0.0, 0.0, WHITE);
         draw_texture(&texture_custom, width as f32 / 2.0, 0.0, WHITE);
         draw_text("Left: draw_line()", 20.0, 20.0, 20.0, WHITE);
-        draw_text("Right: draw_line_ex()", width as f32 / 2.0 + 20.0, 20.0, 20.0, WHITE);
+        draw_text(
+            "Right: draw_line_ex()",
+            width as f32 / 2.0 + 20.0,
+            20.0,
+            20.0,
+            WHITE,
+        );
         next_frame().await;
     }
 }

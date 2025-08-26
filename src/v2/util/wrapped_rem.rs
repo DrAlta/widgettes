@@ -1,7 +1,6 @@
-
+use super::Const;
 use std::cmp::Ordering;
 use std::ops::{Add, Rem, Sub};
-use super::Const;
 
 /// Returns lhs modulo rhs, always in the range [0, rhs).
 /// Handles negative lhs by wrapping into the positive cycle.

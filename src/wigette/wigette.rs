@@ -198,14 +198,13 @@ impl Wigette {
 
 impl Wigette {
     pub fn get_child_mut(&mut self, index: usize) -> Option<&mut Wigette> {
-        let x=  match &mut self.wigette_type {
-             WigetteType::HBox { children, .. } => children.get_mut(index),
-             WigetteType::VBox { children, .. } => children.get_mut(index),
-             _ => None,
-         };
-         x
-     }
- 
+        let x = match &mut self.wigette_type {
+            WigetteType::HBox { children, .. } => children.get_mut(index),
+            WigetteType::VBox { children, .. } => children.get_mut(index),
+            _ => None,
+        };
+        x
+    }
 }
 //misc public funtions
 impl Wigette {
