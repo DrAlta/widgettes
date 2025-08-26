@@ -1,5 +1,5 @@
 mod layout;
-pub use layout::{Rect, Resolution, Layout, LayoutResponse, Widget};
+pub use layout::{Rect, Resolution, Splat, Layout, LayoutResponse, Widget};
 mod graphics;
 pub use graphics::Graphics;
 pub mod util;

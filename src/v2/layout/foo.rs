@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::v2::layout::{LayoutResponse, Rect, Resolution, Widget};
+use crate::v2::{layout::{LayoutResponse, Rect, Resolution, Splat, Widget}, Layout};
 
 
 
@@ -45,12 +45,17 @@ impl<Target> Widget<i32, i32, usize, Target> for Foo<i32> {
     fn layout(
         &self,
         offered: Rect<i32>,
-        mut callback: super::Layout<i32, i32, usize>,
-        mut children_response: HashMap::<usize, super::Layout<i32, i32, usize>>,
+        callback: Option<super::Layout<i32, i32, usize>>,
+        mut children_response: HashMap::<usize, super::Splat<i32, i32, usize>>,
         children: Vec<usize>,
-            ) -> LayoutResponse<i32, i32, usize> {
-        match self {
-            Foo::Base(rect) => LayoutResponse::Layout{rect: rect.clone(), childrens_layouts:HashMap::new() },
+        ) -> LayoutResponse<i32, i32, usize> {
+            let mut callback = if let Some(callback) = callback {
+                callback
+            } else {
+                Layout{ left: 0, top: 0, area: offered.clone(), children: HashMap::new() }
+            };
+            match self {
+            Foo::Base(rect) => LayoutResponse::Layout(Splat{rect: rect.clone(), childrens_layouts:HashMap::new() }),
             Foo::HBox => {
                 let children_to_layout: Vec<_> = children.into_iter().filter(
                     |y|
@@ -63,10 +68,10 @@ impl<Target> Widget<i32, i32, usize, Target> for Foo<i32> {
                     let Some(previous_layout) =  callback.children.get(k) else {
                         return true
                     };
-                    &*v != previous_layout
+                    v.rect != previous_layout.area || v.childrens_layouts != previous_layout.children
                 });
-                for (child_id, layout) in children_response {
-                    callback.children.insert(child_id, layout);
+                for (child_id, splat) in children_response {
+                    callback.children.insert(child_id, super::Layout { left: 0, top: 0, area: splat.rect, children: splat.childrens_layouts });
                 }
                 let mut used = 0;
                 let mut height = 0;
@@ -76,7 +81,7 @@ impl<Target> Widget<i32, i32, usize, Target> for Foo<i32> {
                 }
                 if children_to_layout.is_empty() {
                     //calc my layout
-                    LayoutResponse::Layout { rect: Rect { width: used, height }, childrens_layouts: callback.children }
+                    LayoutResponse::Layout(Splat { rect: Rect { width: used, height }, childrens_layouts: callback.children })
                 } else {
                     let free = offered.width - used;
                     let share = free / children_to_layout.len() as i32;

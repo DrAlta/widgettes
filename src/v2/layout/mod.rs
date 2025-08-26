@@ -18,5 +18,7 @@ mod layout;
 pub use layout::Layout;
 mod resolution;
 pub use resolution::Resolution;
+mod splat;
+pub use splat::Splat;
 mod widget;
 pub use widget::Widget;

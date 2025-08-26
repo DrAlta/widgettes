@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
-use crate::v2::layout::{Layout, LayoutResponse, Rect, Resolution};
+use crate::v2::layout::{Layout, LayoutResponse, Rect, Resolution, Splat};
 
 pub trait Widget<InterSpaxel, Spaxel, ChildId: Eq + std::hash::Hash, Target> {
     fn layout(
         &self,
         offered: Rect<Spaxel>,
-        callback: Layout<InterSpaxel, Spaxel, ChildId>,
-        children_response: HashMap::<ChildId, Layout<InterSpaxel, Spaxel, ChildId>>,
+        callback: Option<Layout<InterSpaxel, Spaxel, ChildId>>,
+        children_responses: HashMap::<ChildId, Splat<InterSpaxel, Spaxel, ChildId>>,
         children: Vec<ChildId>,
     ) -> LayoutResponse<InterSpaxel, Spaxel, ChildId>;
     fn draw_under_children(
