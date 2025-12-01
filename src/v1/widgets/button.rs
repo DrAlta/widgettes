@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 
-use crate::Widget;
+use crate::v1::Widget;
 
 pub struct Button<'a> {
     pub text: String,

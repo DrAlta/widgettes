@@ -1,4 +1,4 @@
-use crate::{widgets::label_text::LabelText, Wigette};
+use crate::v1::{widgets::label_text::LabelText, Wigette};
 
 #[allow(dead_code)]
 pub enum WigetteType {

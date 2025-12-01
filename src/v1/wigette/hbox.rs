@@ -1,4 +1,4 @@
-use crate::{LayoutRet, Wigette};
+use crate::v1::{LayoutRet, Wigette};
 impl Wigette {
     pub fn h_size(
         my_min_width: u32,

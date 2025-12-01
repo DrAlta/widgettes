@@ -6,7 +6,7 @@ use macroquad::{
 };
 use qol::logy;
 
-use crate::{widgets::label_text::LabelText, Results, Widget, WigetteType};
+use crate::{Results, v1::{widgets::label_text::LabelText, Widget, WigetteType}};
 
 pub struct Wigette {
     pub(super) wigette_type: WigetteType,

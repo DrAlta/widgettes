@@ -1,12 +1,4 @@
-mod layout_rec;
-pub mod widgets;
-pub use layout_rec::LayoutRet;
-mod widget;
-pub use widget::Widget;
-mod wigette_type;
-pub use wigette_type::WigetteType;
-mod wigette;
-pub use wigette::Wigette;
+pub mod v1;
 pub mod v2;
 
 type Results<T> = Result<T, String>;

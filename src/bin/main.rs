@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 
-use widgettes::widgets::button::Button;
-use widgettes::Widget;
+use widgettes::v1::widgets::button::Button;
+use widgettes::v1::Widget;
 
 #[macroquad::main("Widget test")]
 pub async fn main() {

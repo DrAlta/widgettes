@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 
-use crate::{Widget, Wigette, WigetteType};
+use crate::v1::{Widget, Wigette, WigetteType};
 
 impl Wigette {
     pub const COLORS: [Color; 8] = [RED, PINK, BLUE, GREEN, PURPLE, YELLOW, ORANGE, MAGENTA];

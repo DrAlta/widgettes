@@ -1,4 +1,4 @@
-use crate::{LayoutRet, Wigette, WigetteType};
+use crate::v1::{LayoutRet, Wigette, WigetteType};
 
 impl Wigette {
     pub fn update_childrens_pos(&mut self, padding: i64) {

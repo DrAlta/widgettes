@@ -2,7 +2,7 @@ use std::{borrow::Borrow, cell::RefCell};
 
 use macroquad::prelude::*;
 
-use crate::Widget;
+use crate::v1::Widget;
 
 pub struct LabelText {
     pub text: String,
