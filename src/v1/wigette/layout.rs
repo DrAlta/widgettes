@@ -1,35 +1,37 @@
+use embedded_graphics::prelude::PixelColor;
+
 use crate::v1::{LayoutRet, Wigette, WigetteType};
 
-impl Wigette {
-    pub fn update_childrens_pos(&mut self, padding: i64) {
-        let mut turtle = 0_i64;
-        let x = self.x + (padding / 2);
-        let y = self.y + (padding / 2);
-        let half_p_width = self.get_width() as i64 / 2;
-        let half_p_height = self.get_height() as i64 / 2;
+impl<'a, C: PixelColor> Wigette<'a, C> {
+    pub fn update_childrens_pos(&mut self, padding: u32) {
+        let mut turtle = 0_i32;
+        let x = self.x + (padding as i32 / 2);
+        let y = self.y + (padding as i32 / 2);
+        let half_p_width = (self.get_width() / 2 ) as i32 ;
+        let half_p_height = (self.get_height() / 2 ) as i32 ;
         match &mut self.wigette_type {
             WigetteType::HBox { children, .. } => {
                 for (index, child) in children.into_iter().enumerate() {
-                    let c_height = child.get_height() as i64;
-                    let c_width = child.get_width() as i64;
-                    let my_padding = index as i64 * padding;
+                    let c_height = child.get_height();
+                    let c_width = child.get_width() ;
+                    let my_padding = index as u32 * padding;
                     child.set_pos(
-                        x + turtle + (index as i64 * padding),
-                        (y + half_p_height) - ((padding + c_height) / 2),
+                        x + turtle + (index as i32 * padding as i32 ),
+                        (y + half_p_height) - ((padding + c_height) / 2) as i32 ,
                     );
-                    turtle += c_width + my_padding;
+                    turtle += (c_width + my_padding) as i32 ;
                 }
             }
             WigetteType::VBox { children, .. } => {
                 for (index, child) in children.into_iter().enumerate() {
-                    let c_height = child.get_height() as i64;
-                    let c_width = child.get_width() as i64;
-                    let my_padding = index as i64 * padding;
+                    let c_height = child.get_height() as u32;
+                    let c_width = child.get_width() as u32;
+                    let my_padding = index as u32 * padding;
                     child.set_pos(
-                        (x + half_p_width) - ((padding + c_width) / 2),
-                        y + turtle + my_padding,
+                        (x + half_p_width) - ((padding + c_width) / 2) as i32,
+                        y + turtle + my_padding as i32,
                     );
-                    turtle += c_height + my_padding;
+                    turtle += (c_height + my_padding) as i32;
                 }
             }
             WigetteType::Box => {}

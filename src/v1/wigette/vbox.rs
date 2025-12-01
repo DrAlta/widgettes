@@ -1,9 +1,11 @@
+use embedded_graphics::prelude::PixelColor;
+
 use crate::v1::{LayoutRet, Wigette};
-impl Wigette {
+impl<'a, C: PixelColor> Wigette<'a, C> {
     pub fn v_size(
         my_min_width: usize,
         my_min_height: usize,
-        children: &mut Vec<Wigette>,
+        children: &mut Vec<Wigette<'a, C>>,
         padding: i64,
     ) -> LayoutRet {
         let mut needed_height = padding as usize * children.len();

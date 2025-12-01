@@ -1,4 +1,10 @@
-use macroquad::prelude::*;
+use embedded_graphics::{
+    pixelcolor::Rgb565,
+    prelude::*,
+    primitives::{Line, PrimitiveStyle},
+};
+// Assuming you have your other structs defined somewhere
+// use crate::{ApptInfo, StartTime, EndTime}; 
 
 #[derive(Debug, Clone)]
 pub struct ApptInfo {
@@ -6,109 +12,84 @@ pub struct ApptInfo {
     pub end_time: EndTime,
 }
 
-pub const TIME_BAR_WIDTH: f32 = 10.0;
-pub const NUM_COLUMNS: usize = 5; // Max number of time bar columns
+pub const TIME_BAR_WIDTH: i32 = 10; // Changed to i32 for consistency with Point
+pub const NUM_COLUMNS: usize = 5; 
 
 type EndTime = i64;
 type StartTime = i64;
 
-// this has been commited by Chad
-pub fn draw_time_bars(offset: Vec2, mut appointments: Vec<ApptInfo>) {
-    // Defines a function that takes a position offset and a vector of appointments.
-    // The offset helps position the drawn bars correctly in the coordinate system.
+// The function signature now accepts a DrawTarget and returns a Result
+pub fn draw_time_bars<T: DrawTarget<Color = Rgb565>>(
+    offset: Point, // Changed from Vec2 to Point
+    mut appointments: Vec<ApptInfo>,
+    target: &mut T // Added DrawTarget
+) -> Result<(), <T as DrawTarget>::Error> {
 
-    let thickness = 1.0;
-    // Defines the thickness of the bars in the visualization.
+    let thickness = 1u32; // Stroke width is u32
 
     appointments.sort_by_key(|appt| appt.end_time);
-    // Sorts appointments by their end times to process them in chronological order.
-    // This ensures that overlapping appointments are handled properly in column assignment.
-
+    
     let mut bars: [Vec<(StartTime, EndTime)>; 5] = core::array::from_fn(|_| Vec::new());
-    // Initializes an array of 5 vectors, each storing (start_time, end_time) pairs for different columns.
-    // This helps distribute appointments across multiple columns to prevent overlap.
-
+    
     let mut end_times = vec![0; NUM_COLUMNS];
-    // Tracks the latest end time in each column, helping to determine where new appointments should go.
-
+    
     for appt in appointments {
-        // Iterates through sorted appointments and assigns them to columns.
-
         let mut best_column_maybe = None;
-        // Placeholder for the best column to place the appointment.
-
         let mut min_gap = i64::MAX;
-        // Tracks the smallest gap between an appointment’s start time and the latest end time in a column.
 
         for i in 0..NUM_COLUMNS {
-            // Loops through available columns to find the best placement.
-
             let gap = appt.start_time - end_times[i];
-            // Calculates the time gap between the current appointment and the last scheduled appointment in this column.
-
             if gap >= 0 && gap < min_gap {
-                // If the gap is valid (appointment does not overlap) and is the smallest found so far:
                 min_gap = gap;
                 best_column_maybe = Some(i);
             }
         }
 
         let Some(best_column) = best_column_maybe else {
-            // If no suitable column is found, print an error and skip this appointment.
             println!("failed to find column");
             continue;
         };
 
         end_times[best_column] = appt.end_time;
-        // Updates the latest end time for the chosen column.
-
         bars[best_column].push((appt.start_time, appt.end_time));
-        // Stores the appointment times in the assigned column.
     }
+
+    // Define the style once, using embedded_graphics colors and thickness
+    let line_style = PrimitiveStyle::with_stroke(Rgb565::WHITE, thickness);
 
     for (col_idx, col) in bars.iter().enumerate() {
-        // Loops through each column and draws the corresponding time bars.
-
         for bar in col {
-            // Iterates over appointments in this column.
+            let x = col_idx as i32 * TIME_BAR_WIDTH; // Use i32
+            let y1 = bar.0 as i32;
+            let y2 = bar.1 as i32;
+            
+            let start_point = offset + Point::new(x, y1);
+            let end_point = offset + Point::new(x, y2);
 
-            let x = col_idx as f32 * TIME_BAR_WIDTH;
-            // Calculates the horizontal position based on column index.
+            // 1. Vertical time bar (from start to end)
+            Line::new(start_point, end_point)
+                .into_styled(line_style)
+                .draw(target)?;
 
-            let y1 = bar.0 as f32;
-            let y2 = bar.1 as f32;
-            // Retrieves the start and end times for the vertical positioning.
+            // 2. Top horizontal line
+            Line::new(
+                start_point,
+                start_point + Point::new(TIME_BAR_WIDTH - (1 + thickness as i32), 0)
+            )
+            .into_styled(line_style)
+            .draw(target)?;
 
-            draw_line(
-                offset.x + x,
-                offset.y + y1,
-                offset.x + x,
-                offset.y + y2,
-                thickness,
-                WHITE,
-            ); // Vertical time bar from start to end.
-
-            draw_line(
-                offset.x + x,
-                offset.y + y1,
-                offset.x + x + TIME_BAR_WIDTH - (1.0 + thickness),
-                offset.y + y1,
-                thickness,
-                WHITE,
-            );
-            // Draws the **top horizontal line** of the appointment bar.
-
-            draw_line(
-                offset.x + x,
-                offset.y + y2,
-                offset.x + x + TIME_BAR_WIDTH - (1.0 + thickness),
-                offset.y + y2,
-                thickness,
-                WHITE,
-            );
-            // Draws the **bottom horizontal line** of the appointment bar.
+            // 3. Bottom horizontal line
+            Line::new(
+                end_point,
+                end_point + Point::new(TIME_BAR_WIDTH - (1 + thickness as i32), 0)
+            )
+            .into_styled(line_style)
+            .draw(target)?;
         }
     }
+    
+    Ok(()) // Must return Ok(()) now
 }
 
 /* hand coded
